@@ -3,6 +3,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 
 from football_club_api.db import engine, Base
+from football_club_api.routers import api_router
 
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
@@ -19,3 +20,5 @@ app = FastAPI(
     version="1.0.1",
     lifespan=lifespan,
 )
+
+app.include_router(api_router)
