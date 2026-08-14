@@ -44,14 +44,3 @@ class AuthService:
         return Token(access_token=access_token, token_type="bearer")
         
 
-class UserService:
-    def __init__(self, user_repo: UserRepository):
-        self.user_repo = user_repo
-
-    async def get_user_profile_by_id(self, user_id: int) -> UserPublic:
-        user = await self.user_repo.get_user_by_user_id(user_id)
-        
-        if not user:
-            raise ValueError("User not found")
-            
-        return UserPublic.model_validate(user)

@@ -6,8 +6,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from football_club_api.db import get_db
 from football_club_api.schemas import UserCreate, UserPrivate, UserPublic
 from football_club_api.repositories.user import UserRepository
-from football_club_api.services.auth import AuthService, UserService
+from football_club_api.services import AuthService, UserService
 from football_club_api.models import Token
+from football_club_api.security import CurrentUser
+
 
 router = APIRouter()
 
@@ -31,6 +33,12 @@ async def create_user(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=str(e)
         )
+
+@router.get("/me")
+async def get_current_user(
+    current_user: CurrentUser
+) -> UserPrivate:
+    return UserPrivate.model_validate(current_user)
 
 @router.get(
     "/{user_id}",
@@ -74,3 +82,4 @@ async def access_by_token(
             detail=str(e),
             headers={"WWW-Authenticate": "Bearer"},
         )
+
