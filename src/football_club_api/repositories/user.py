@@ -1,4 +1,4 @@
-from sqlalchemy import select, func
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from football_club_api.models import User
 
@@ -49,3 +49,18 @@ class UserRepository:
                 )
         )
         return result.scalars().first()
+
+    async def update_user(self, db_user: User, update_data: dict) -> User:
+        for key, value in update_data.items():
+            setattr(db_user, key, value) 
+
+        self.session.add(db_user)
+        await self.session.commit()
+        await self.session.refresh(db_user)
+        return db_user
+
+    async def delete_user(self, db_user: User) -> None:
+        """ Delete user """
+        await self.session.delete(db_user)
+        await self.session.commit()
+

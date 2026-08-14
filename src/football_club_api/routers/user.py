@@ -4,7 +4,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from football_club_api.db import get_db
-from football_club_api.schemas import UserCreate, UserPrivate, UserPublic
+from football_club_api.schemas import UserCreate, UserPrivate, UserPublic, UserUpdate
 from football_club_api.repositories.user import UserRepository
 from football_club_api.services import AuthService, UserService
 from football_club_api.models import Token
@@ -38,7 +38,8 @@ async def create_user(
 async def get_current_user(
     current_user: CurrentUser
 ) -> UserPrivate:
-    return UserPrivate.model_validate(current_user)
+    """ Get current authorized user """
+    return UserPrivate.model_validate(current_user) 
 
 @router.get(
     "/{user_id}",
@@ -83,3 +84,41 @@ async def access_by_token(
             headers={"WWW-Authenticate": "Bearer"},
         )
 
+@router.patch("/me")
+async def partial_user_profile_update(
+    user_update: UserUpdate,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: CurrentUser,
+) -> UserPrivate:
+    """User's profile partial UPDATE """
+    user_repository = UserRepository(db)
+    user_service = UserService(user_repository)
+
+    try:
+        update_user = await user_service.partial_update_user_profile(
+            current_user=current_user,
+            user_update=user_update
+        )
+        return update_user
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e)
+        )
+
+@router.delete("/me", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_user(
+    current_user: CurrentUser,
+    db: Annotated[AsyncSession, Depends(get_db)],
+) -> None:
+    """ Delete current user """
+    user_repository = UserRepository(db)
+    user_service = UserService(user_repository)
+
+    try:
+        await user_service.delete_user(current_user)
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(e)
+        )
