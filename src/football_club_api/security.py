@@ -65,12 +65,6 @@ def verify_access_token(token: str) -> str | None:
     else:
         return payload.get("sub")
 
-""" 
-
-
-UNTIL 
-
-
 
 async def get_current_user(
     token: Annotated[str, Depends(oauth2_scheme)],
@@ -107,18 +101,3 @@ async def get_current_user(
 
 CurrentUser = Annotated[User, Depends(get_current_user)]
 
-
-async def get_current_admin(
-    current_user: Annotated[User, Depends(get_current_user)]
-) -> User:
-    if current_user.role != "admin":
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="You do not have enough permissions. Admin only.",
-        )
-    return current_user
-
-CurrentAdmin = Annotated[User, Depends(get_current_admin)]
-
-
-"""

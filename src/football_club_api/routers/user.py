@@ -1,23 +1,24 @@
 from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from football_club_api.db import get_db
 from football_club_api.schemas import UserCreate, UserPrivate, UserPublic
 from football_club_api.repositories.user import UserRepository
 from football_club_api.services.auth import AuthService, UserService
+from football_club_api.models import Token
 
 router = APIRouter()
 
 @router.post(
     "",
-    response_model=UserPrivate,
     status_code=status.HTTP_201_CREATED,
 )
 async def create_user(
     user_data: UserCreate, 
     db: Annotated[AsyncSession, Depends(get_db)]
-):
+) -> UserPrivate:
     """ User creation """
     user_repository = UserRepository(db)
     auth_service = AuthService(user_repository)
@@ -33,13 +34,12 @@ async def create_user(
 
 @router.get(
     "/{user_id}",
-    response_model=UserPublic,
     status_code=status.HTTP_200_OK,
 )
 async def get_user_by_user_id(
     user_id: int, 
     db: Annotated[AsyncSession, Depends(get_db)]
-):
+) -> UserPublic:
     """ Get user profile by user id """
     user_repository = UserRepository(db)
     user_service = UserService(user_repository)
@@ -51,4 +51,26 @@ async def get_user_by_user_id(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=str(e)
+        )
+
+@router.post("/token")
+async def access_by_token(
+    form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
+    db: Annotated[AsyncSession, Depends(get_db)]
+) -> Token:
+    user_repository = UserRepository(db)
+    auth_service = AuthService(user_repository)
+
+    login_input = form_data.username.strip().lower()
+
+    try:
+        return await auth_service.authenticate_user(
+            login_input=login_input, 
+            password_input=form_data.password
+        )
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=str(e),
+            headers={"WWW-Authenticate": "Bearer"},
         )

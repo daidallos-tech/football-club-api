@@ -23,14 +23,14 @@ class UserRepository:
     async def get_by_username_lower(self, username: str) -> User | None:
         """ Search user by username """
         result = await self.session.execute(
-            select(User).where(func.lower(User.username) == username.lower())
+            select(User).where(User.username == username)
         )
         return result.scalars().first()
 
     async def get_by_email_lower(self, email: str) -> User | None:
         """ Search user by email """
         result = await self.session.execute(
-            select(User).where(func.lower(User.email) == email.lower())
+            select(User).where(User.email == email)
         )
         return result.scalars().first()
 
@@ -38,5 +38,14 @@ class UserRepository:
         """ Search user by user id """
         result = await self.session.execute(
             select(User).where(User.id == user_id)
+        )
+        return result.scalars().first()
+
+    async def get_user_by_email_or_username(self, login: str) -> User | None:
+        """ Search user by email or username """
+        result = await self.session.execute(
+            select(User).where(
+                (User.email == login) | (User.username == login)
+                )
         )
         return result.scalars().first()

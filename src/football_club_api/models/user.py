@@ -1,5 +1,5 @@
 from football_club_api.db import Base
-from sqlalchemy import Integer, String
+from sqlalchemy import Integer, String, Index, func
 from sqlalchemy.orm import Mapped, mapped_column
 
 class User(Base):
