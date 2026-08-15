@@ -26,7 +26,6 @@ class UserPublic(BaseModel):
     id: int
     username: str
     image_file: str | None = None
-    image_path: str | None = None
 
 class UserPrivate(UserPublic):
     model_config = ConfigDict(from_attributes=True)

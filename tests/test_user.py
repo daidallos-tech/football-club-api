@@ -121,6 +121,36 @@ async def test_get_user_by_user_id_success(client: AsyncClient):
     assert data["username"] == "testuser"
     assert "id" in data
     assert "image_file" in data
+    assert "email" not in data
     assert "password" not in data
     assert "password_hash" not in data
+
+
+@pytest.mark.anyio
+async def test_get_user_by_non_existing_id(client: AsyncClient):
+    response = await client.get(
+            "/api/users/99999"
+        )
+
+    assert response.status_code == 404
+
+@pytest.mark.anyio
+async def test_partial_user_profile_update(client: AsyncClient):
+    await create_test_user(client)
+    token = await login_user(client)
+    headers = auth_header(token)
+
+    response = await client.patch(
+        "/api/users/me",
+        json={
+            "username": "update_username"
+        },
+        headers=headers
+    )
+
+    assert response.status_code == 200
+    data = response.json()
+    assert data["username"] == "update_username"
+    assert data["email"] == "test@example.com"
+    assert "image_file" in data
 
