@@ -2,9 +2,9 @@ from datetime import timedelta, UTC, datetime
 
 from fastapi import BackgroundTasks
 
-from football_club_api.schemas import UserCreate, UserPublic, UserPrivate
+from football_club_api.schemas import UserCreate, UserPrivate, ResetPasswordRequest
 from football_club_api.repositories import UserRepository
-from football_club_api.models import User, Token, PasswordResetToken
+from football_club_api.models import Token, PasswordResetToken
 from football_club_api.security import hash_password, verify_password, create_access_token, generate_reset_token, hash_reset_token
 from football_club_api.db import settings
 
@@ -76,4 +76,23 @@ class AuthService:
                 username=user.username,
                 token=token,
             )
+
+    async def reset_user_password(self, request_data: ResetPasswordRequest) -> None:
+        token_hash = hash_reset_token(request_data.token)
+        reset_token = await self.user_repo.get_reset_token_by_hash(token_hash)
+
+        if not reset_token:
+            raise ValueError("Invalid or expired reset token")
+
+        token_expiry = reset_token.expires_at.replace(tzinfo=UTC) if reset_token.expires_at.tzinfo is None else reset_token.expires_at
+        if token_expiry < datetime.now(UTC):
+            await self.user_repo.delete_token(reset_token)
+            raise ValueError("Invalid or expired reset token")
+
+        user = await self.user_repo.get_user_by_user_id(reset_token.user_id)
+        if not user:
+            raise ValueError("Invalid or expired reset token")
+        
+        new_password_hash = hash_password(request_data.new_password)
+        await self.user_repo.update_user_password(user, new_password_hash)
 

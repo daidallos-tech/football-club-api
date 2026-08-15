@@ -4,7 +4,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from football_club_api.db import get_db
-from football_club_api.schemas import UserCreate, UserPrivate, UserPublic, UserUpdate, ForgotPasswordRequest
+from football_club_api.schemas import UserCreate, UserPrivate, UserPublic, UserUpdate, ForgotPasswordRequest, ResetPasswordRequest
 from football_club_api.repositories import UserRepository
 from football_club_api.services import AuthService, UserService
 from football_club_api.models import Token
@@ -133,11 +133,38 @@ async def forgot_password(
     user_repository = UserRepository(db)
     auth_service = AuthService(user_repository)
 
-    await auth_service.reset_forgotten_user_password(
-        email_input=request_data.email, 
-        background_tasks=background_tasks
-    )
+    try:
+        await auth_service.reset_forgotten_user_password(
+            email_input=request_data.email, 
+            background_tasks=background_tasks
+        )
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e)
+        )
 
     return {
         "message": "If an account exists with this email, you will receive password reset instructions."
     }
+
+@router.post("/reset-password", status_code=status.HTTP_200_OK)
+async def reset_password(
+    request_data: ResetPasswordRequest,
+    db: Annotated[AsyncSession, Depends(get_db)]
+):
+    """ Reset forgotten password by token from email """
+    user_repository = UserRepository(db)
+    auth_service = AuthService(user_repository)
+
+    try:
+        await auth_service.reset_user_password(request_data)
+        
+        return {
+            "message": "Password reset successfully. You can now log in with your new password.",
+        }
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e)
+        )

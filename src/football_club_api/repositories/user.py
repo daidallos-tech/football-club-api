@@ -76,4 +76,23 @@ class UserRepository:
         self.session.add(reset_token)
         await self.session.commit()
 
+    async def get_reset_token_by_hash(self, token_hash: str) -> PasswordResetToken | None:
+        result = await self.session.execute(
+            select(PasswordResetToken).where(
+                PasswordResetToken.token_hash == token_hash
+            )
+        )
+        return result.scalars().first()
 
+    async def delete_token(self, reset_token: PasswordResetToken) -> None:
+        await self.session.delete(reset_token)
+        await self.session.commit()
+
+    async def update_user_password(self, user: User, new_password: str) -> None:
+        user.password_hash = new_password
+        self.session.add(user)
+
+        await self.session.execute(
+            sql_delete(PasswordResetToken).where(PasswordResetToken.user_id == user.id)
+        )
+        await self.session.commit()
