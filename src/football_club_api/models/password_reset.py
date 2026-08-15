@@ -1,10 +1,14 @@
 from datetime import datetime, UTC
 
+from typing import TYPE_CHECKING
+
 from football_club_api.db import Base
 from sqlalchemy import Integer, String, ForeignKey, DateTime
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from .user import User
+
+if TYPE_CHECKING:
+    from .user import User
 
 class PasswordResetToken(Base):
     __tablename__ = "password_reset_tokens"
@@ -21,4 +25,4 @@ class PasswordResetToken(Base):
         default=lambda: datetime.now(UTC),
     )
 
-    user: Mapped[User] = relationship(back_populates="reset_tokens")
+    user: Mapped["User"] = relationship(back_populates="reset_tokens")

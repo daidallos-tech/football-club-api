@@ -1,6 +1,7 @@
 from sqlalchemy import select
+from sqlalchemy import delete as sql_delete
 from sqlalchemy.ext.asyncio import AsyncSession
-from football_club_api.models import User
+from football_club_api.models import User, PasswordResetToken
 
 class UserRepository:
     def __init__(self, db_session: AsyncSession):
@@ -63,4 +64,16 @@ class UserRepository:
         """ Delete user """
         await self.session.delete(db_user)
         await self.session.commit()
+
+    async def delete_existing_token(self, user_id: int) -> None:
+        await self.session.execute(
+            sql_delete(PasswordResetToken).where(
+                PasswordResetToken.user_id == user_id,
+            )
+        )
+
+    async def save_reset_token(self, reset_token: PasswordResetToken) -> None:
+        self.session.add(reset_token)
+        await self.session.commit()
+
 

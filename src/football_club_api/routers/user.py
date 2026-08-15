@@ -1,11 +1,11 @@
 from typing import Annotated
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from football_club_api.db import get_db
-from football_club_api.schemas import UserCreate, UserPrivate, UserPublic, UserUpdate
-from football_club_api.repositories.user import UserRepository
+from football_club_api.schemas import UserCreate, UserPrivate, UserPublic, UserUpdate, ForgotPasswordRequest
+from football_club_api.repositories import UserRepository
 from football_club_api.services import AuthService, UserService
 from football_club_api.models import Token
 from football_club_api.security import CurrentUser
@@ -122,3 +122,22 @@ async def delete_user(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=str(e)
         )
+
+@router.post("/forgot-password", status_code=status.HTTP_202_ACCEPTED)
+async def forgot_password(
+    request_data: ForgotPasswordRequest,
+    background_tasks: BackgroundTasks,
+    db: Annotated[AsyncSession, Depends(get_db)],
+):
+    """ Reset forgotten password by get email with instructions """
+    user_repository = UserRepository(db)
+    auth_service = AuthService(user_repository)
+
+    await auth_service.reset_forgotten_user_password(
+        email_input=request_data.email, 
+        background_tasks=background_tasks
+    )
+
+    return {
+        "message": "If an account exists with this email, you will receive password reset instructions."
+    }

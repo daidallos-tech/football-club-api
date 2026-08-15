@@ -49,4 +49,6 @@ class UserService:
             raise ValueError("User not found")
 
         await self.user_repo.delete_user(db_user)
+
+    
     

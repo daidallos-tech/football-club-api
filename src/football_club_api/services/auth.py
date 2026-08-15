@@ -1,10 +1,14 @@
-from datetime import timedelta
+from datetime import timedelta, UTC, datetime
+
+from fastapi import BackgroundTasks
 
 from football_club_api.schemas import UserCreate, UserPublic, UserPrivate
 from football_club_api.repositories import UserRepository
-from football_club_api.models import User, Token
-from football_club_api.security import hash_password, verify_password, create_access_token
+from football_club_api.models import User, Token, PasswordResetToken
+from football_club_api.security import hash_password, verify_password, create_access_token, generate_reset_token, hash_reset_token
 from football_club_api.db import settings
+
+from football_club_api.utils import send_password_reset_email
 
 class AuthService:
     def __init__(self, user_repo: UserRepository):
@@ -42,5 +46,34 @@ class AuthService:
         )
         
         return Token(access_token=access_token, token_type="bearer")
-        
+
+    async def reset_forgotten_user_password(self, email_input: str, background_tasks: BackgroundTasks
+    ) -> None: 
+        """ Delete and reset token """
+        clean_email = email_input.strip().lower()
+        user = await self.user_repo.get_user_by_email_or_username(clean_email)
+
+        if user:
+            await self.user_repo.delete_existing_token(user.id)
+
+            token = generate_reset_token()
+            token_hash = hash_reset_token(token)
+            expires_at = datetime.now(UTC) + timedelta(
+                minutes=settings.reset_token_expire_minutes,
+            )
+
+            reset_token = PasswordResetToken(
+                user_id=user.id,
+                token_hash=token_hash,
+                expires_at=expires_at,
+            )
+            
+            await self.user_repo.save_reset_token(reset_token)
+
+            background_tasks.add_task(
+                send_password_reset_email,
+                to_email=user.email,
+                username=user.username,
+                token=token,
+            )
 
