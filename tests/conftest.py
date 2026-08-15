@@ -9,7 +9,7 @@ from sqlalchemy import text
 
 os.environ["DATABASE_URL"] = os.getenv(
     "DATABASE_URL", 
-    "postgresql+psycopg://postgres:379137@localhost/test_movies_db"
+    "postgresql+psycopg://postgres:379137@localhost/test_football_club_db"
 )
 
 
@@ -74,7 +74,6 @@ async def client(db_session: AsyncSession) -> AsyncGenerator[AsyncClient, None]:
 
     app.dependency_overrides.clear()
 
-# === USER ===
 async def create_test_user(
     client: AsyncClient,
     username: str = "testuser",
