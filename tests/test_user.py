@@ -154,3 +154,50 @@ async def test_partial_user_profile_update(client: AsyncClient):
     assert data["email"] == "test@example.com"
     assert "image_file" in data
 
+@pytest.mark.anyio
+async def test_partial_user_profile_update_by_non_authorized(client: AsyncClient):
+    response = await client.patch(
+            "/api/users/me",
+            json={
+                "username": "update_username"
+            }
+        )
+
+    assert response.status_code == 401
+
+@pytest.mark.anyio
+async def test_partial_user_profile_update_error_validation(client: AsyncClient):
+    await create_test_user(client)
+    token = await login_user(client)
+    headers = auth_header(token)
+
+    response = await client.patch(
+        "/api/users/me",
+        json={
+            "username": 123456
+        },
+        headers=headers
+    )
+
+    assert response.status_code == 422
+
+@pytest.mark.anyio
+async def test_delete_user_success(client: AsyncClient):
+    await create_test_user(client)
+    token = await login_user(client)
+    headers = auth_header(token)
+
+    response = await client.delete(
+        "/api/users/me",
+        headers=headers
+    )
+
+    assert response.status_code == 204
+
+@pytest.mark.anyio
+async def test_delete_user_by_non_authorized(client: AsyncClient):
+    response = await client.delete(
+            "/api/users/me",
+        )
+
+    assert response.status_code == 401
