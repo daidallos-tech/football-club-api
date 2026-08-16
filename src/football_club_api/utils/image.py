@@ -4,7 +4,9 @@ from pathlib import Path
 
 from PIL import Image, ImageOps
 
-MEDIA_DIR = Path("media")
+BASE_DIR = Path(__file__).resolve().parent.parent.parent.parent
+
+MEDIA_DIR = BASE_DIR / "media"
 
 IMAGE_CONFIGS = {
     "user": {"dir": MEDIA_DIR / "profile_pics", "size": (300, 300)},

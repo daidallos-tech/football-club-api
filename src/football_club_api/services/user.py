@@ -89,5 +89,15 @@ class UserService:
 
         return UserPrivate.model_validate(updated_db_user)
 
+    async def delete_user_avatar(self, current_user: CurrentUser) -> None:
+        db_user = await self.user_repo.get_user_by_user_id(current_user.id)
+        
+        if not db_user or not db_user.image_file:
+            raise ValueError("User or picture not found")
+
+        old_filename = db_user.image_file
+
+        await self.user_repo.update_user(db_user, {"image_file": None})
+        await run_in_threadpool(delete_image, old_filename, "user")
     
     

@@ -188,3 +188,19 @@ async def upload_user_profile_picture(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=str(e)
         )
+
+@router.delete("/me/picture", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_user_profile_picture(
+    current_user: CurrentUser,
+    db: Annotated[AsyncSession, Depends(get_db)],
+):
+    user_repository = UserRepository(db)
+    user_service = UserService(user_repository)
+
+    try:
+        return await user_service.delete_user_avatar(current_user)
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e)
+        )
