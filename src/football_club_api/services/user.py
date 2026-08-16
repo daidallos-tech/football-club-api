@@ -2,7 +2,7 @@ from fastapi import UploadFile
 
 from football_club_api.schemas import UserPublic, UserPrivate, UserUpdate
 from football_club_api.repositories import UserRepository
-from football_club_api.security import CurrentUser
+from football_club_api.security import CurrentUser, CurrentAdmin
 
 from football_club_api.db import settings
 
@@ -99,5 +99,39 @@ class UserService:
 
         await self.user_repo.update_user(db_user, {"image_file": None})
         await run_in_threadpool(delete_image, old_filename, "user")
+
+    async def admin_delete_user_by_id(self, user_id: int) -> None:
+        db_user = await self.user_repo.get_user_by_user_id(user_id)
+        
+        if not db_user:
+            raise ValueError(f"User with ID {user_id} not found")
     
-    
+        await self.user_repo.delete_user(db_user)
+
+    async def admin_update_partial_user_profile_by_id(self, user_id: int, user_update: UserUpdate) -> UserPrivate:
+        db_user = await self.user_repo.get_user_by_user_id(user_id)
+                
+        if not db_user:
+            raise ValueError(f"User with ID {user_id} not found")
+
+        update_data = user_update.model_dump(exclude_unset=True)
+        
+        if "username" in update_data:
+            new_username = update_data["username"].strip().lower()
+            if new_username != db_user.username:
+                if await self.user_repo.get_user_by_email_or_username(new_username):
+                    raise ValueError("Username already exists")
+            update_data["username"] = new_username
+
+        if "email" in update_data:
+            new_email = update_data["email"].strip().lower()
+            if new_email != db_user.email:
+                if await self.user_repo.get_user_by_email_or_username(new_email):
+                    raise ValueError("Email already exists")
+            update_data["email"] = new_email
+
+        updated_db_user = await self.user_repo.update_user(db_user, update_data)
+
+        print("DB", updated_db_user.id, updated_db_user.username, updated_db_user.email)
+        
+        return UserPrivate.model_validate(updated_db_user)

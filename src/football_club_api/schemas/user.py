@@ -31,6 +31,7 @@ class UserPrivate(UserPublic):
     model_config = ConfigDict(from_attributes=True)
 
     email: EmailStr
+    role: str
 
 class UserUpdate(BaseModel):
     username: str | None = Field(default=None, min_length=USERNAME_MIN_LENGTH, max_length=USERNAME_MAX_LENGTH)
