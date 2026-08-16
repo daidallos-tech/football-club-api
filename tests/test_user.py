@@ -233,3 +233,49 @@ async def test_upload_image_by_non_authorized(client: AsyncClient):
     )
 
     assert response.status_code == 401
+
+@pytest.mark.anyio
+async def test_delete_image_success(client: AsyncClient):
+    await create_test_user(client)
+    token = await login_user(client)
+    headers = auth_header(token)
+
+    test_image_path = Path(__file__).parent / "test_image.jpg"
+    image_bytes = test_image_path.read_bytes()
+    
+    upload_response = await client.patch(
+        "/api/users/me/picture",
+        files={"file": ("profile.jpg", image_bytes, "image/jpeg")},
+        headers=headers
+    )
+
+    assert upload_response.status_code == 200
+
+    delete_response = await client.delete(
+            "/api/users/me/picture",
+            headers=headers
+        )
+
+    assert delete_response.status_code == 204
+
+@pytest.mark.anyio
+async def test_delete_image_by_non_authorized(client: AsyncClient):
+    delete_response = await client.delete(
+            "/api/users/me/picture"
+        )
+
+    assert delete_response.status_code == 401
+
+@pytest.mark.anyio
+async def test_delete_non_existing_image(client: AsyncClient):
+    await create_test_user(client)
+    token = await login_user(client)
+    headers = auth_header(token)
+
+    delete_response = await client.delete(
+            "/api/users/me/picture",
+            headers=headers
+        )
+
+    assert delete_response.status_code == 400
+    assert delete_response.json()["detail"] == "User or picture not found"
