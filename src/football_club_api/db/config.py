@@ -20,6 +20,8 @@ class Settings(BaseSettings):
 
     reset_token_expire_minutes: int = 60
 
+    max_upload_size_bytes: int = 5 * 1024 * 1024
+
     mail_server: str
     mail_port: int
     mail_username: str

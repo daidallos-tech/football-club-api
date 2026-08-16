@@ -22,3 +22,9 @@ class User(Base):
         back_populates="user",
         cascade="all, delete-orphan",
     )
+
+    @property
+    def image_path(self) -> str | None:
+        if self.image_file is None:
+            return None
+        return f"/media/dir_pics/{self.image_file}"

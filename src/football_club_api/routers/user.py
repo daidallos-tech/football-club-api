@@ -1,5 +1,5 @@
 from typing import Annotated
-from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
+from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks, UploadFile, File
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -163,6 +163,26 @@ async def reset_password(
         return {
             "message": "Password reset successfully. You can now log in with your new password.",
         }
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e)
+        )
+
+@router.patch("/me/picture")
+async def upload_user_profile_picture(
+    file: Annotated[UploadFile, File(...)],
+    current_user: CurrentUser,
+    db: Annotated[AsyncSession, Depends(get_db)],
+):
+    user_repository = UserRepository(db)
+    user_service = UserService(user_repository)
+
+    try:
+        return await user_service.upload_user_avatar(
+            current_user=current_user, 
+            file=file
+        )
     except ValueError as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,

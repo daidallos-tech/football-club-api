@@ -1,6 +1,16 @@
+from fastapi import UploadFile
+
 from football_club_api.schemas import UserPublic, UserPrivate, UserUpdate
 from football_club_api.repositories import UserRepository
 from football_club_api.security import CurrentUser
+
+from football_club_api.db import settings
+
+from starlette.concurrency import run_in_threadpool
+
+from PIL import UnidentifiedImageError
+
+from football_club_api.utils import process_and_save_image, delete_image
 
 class UserService:
     def __init__(self, user_repo: UserRepository):
@@ -49,6 +59,35 @@ class UserService:
             raise ValueError("User not found")
 
         await self.user_repo.delete_user(db_user)
+
+    async def upload_user_avatar(
+        self, current_user: CurrentUser, file: UploadFile
+    ) -> UserPrivate:
+        
+        content = await file.read()
+        if len(content) > settings.max_upload_size_bytes:
+            max_mb = settings.max_upload_size_bytes // (1024 * 1024)
+            raise ValueError(f"File too large. Maximum size is {max_mb}MB")
+
+        try:
+            new_filename = await run_in_threadpool(process_and_save_image, content, "user")
+        except UnidentifiedImageError:
+            raise ValueError("Invalid image file. Please upload a valid image (JPEG, PNG, GIF, WebP).")
+
+        db_user = await self.user_repo.get_user_by_user_id(current_user.id)
+        if not db_user:
+            delete_image(new_filename, "user")
+            raise ValueError("User not found")
+
+        old_filename = db_user.image_file
+
+        update_data = {"image_file": new_filename}
+        updated_db_user = await self.user_repo.update_user(db_user, update_data)
+
+        if old_filename:
+            await run_in_threadpool(delete_image, old_filename, "user")
+
+        return UserPrivate.model_validate(updated_db_user)
 
     
     
