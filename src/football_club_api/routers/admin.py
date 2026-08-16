@@ -11,7 +11,7 @@ from football_club_api.schemas import UserUpdate, UserPrivate
 
 router = APIRouter()
 
-@router.delete("/admin/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def admin_delete_user_by_id(
     user_id: int,
     db: Annotated[AsyncSession, Depends(get_db)],
@@ -28,7 +28,7 @@ async def admin_delete_user_by_id(
             detail=str(e)
         )
 
-@router.patch("/admin/{user_id}")
+@router.patch("/{user_id}")
 async def admin_partial_update_user_profile_by_id(
     user_id: int,
     user_update: UserUpdate,

@@ -110,3 +110,32 @@ async def login_user(
 
 def auth_header(token: str) -> dict[str, str]:
     return {"Authorization": f"Bearer {token}"}
+
+async def create_test_admin(
+    client: AsyncClient,
+    db_session: AsyncSession
+):
+    response = await client.post(
+        "/api/users",
+        json={"username": "admin", "email": "admin@example.com", "password": "password123"}
+    )
+    user_id = response.json()["id"]
+
+    await db_session.execute(
+        text("UPDATE users SET role = 'admin' WHERE id = :user_id"),
+        {"user_id": user_id}
+    )
+    await db_session.commit()
+
+async def login_admin(client: AsyncClient) -> str:
+    response = await client.post(
+        "/api/users/token",
+        data={
+            "username": "admin@example.com",
+            "password": "password123",
+        },
+    )
+    
+    assert response.status_code == 200, f"Login failed: {response.text}"
+    
+    return response.json()["access_token"]
