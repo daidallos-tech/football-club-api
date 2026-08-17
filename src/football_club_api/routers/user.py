@@ -38,7 +38,7 @@ async def create_user(
 async def get_current_user(
     current_user: CurrentUser
 ) -> UserPrivate:
-    """ Get current authorized user """
+    """Get current authorized user"""
     return UserPrivate.model_validate(current_user) 
 
 @router.get(
@@ -49,7 +49,7 @@ async def get_user_by_user_id(
     user_id: int, 
     db: Annotated[AsyncSession, Depends(get_db)]
 ) -> UserPublic:
-    """ Get user profile by user id """
+    """Get user profile by user id"""
     user_repository = UserRepository(db)
     user_service = UserService(user_repository)
 
@@ -90,7 +90,7 @@ async def partial_user_profile_update(
     db: Annotated[AsyncSession, Depends(get_db)],
     current_user: CurrentUser,
 ) -> UserPrivate:
-    """User's profile partial UPDATE """
+    """User's profile partial UPDATE"""
     user_repository = UserRepository(db)
     user_service = UserService(user_repository)
 
@@ -111,7 +111,7 @@ async def delete_user(
     current_user: CurrentUser,
     db: Annotated[AsyncSession, Depends(get_db)],
 ) -> None:
-    """ Delete current user """
+    """Delete current user"""
     user_repository = UserRepository(db)
     user_service = UserService(user_repository)
 
@@ -129,7 +129,7 @@ async def forgot_password(
     background_tasks: BackgroundTasks,
     db: Annotated[AsyncSession, Depends(get_db)],
 ):
-    """ Reset forgotten password by get email with instructions """
+    """Reset forgotten password by get email with instructions"""
     user_repository = UserRepository(db)
     auth_service = AuthService(user_repository)
 
@@ -153,7 +153,7 @@ async def reset_password(
     request_data: ResetPasswordRequest,
     db: Annotated[AsyncSession, Depends(get_db)]
 ):
-    """ Reset forgotten password by token from email """
+    """Reset forgotten password by token from email"""
     user_repository = UserRepository(db)
     auth_service = AuthService(user_repository)
 
@@ -175,6 +175,7 @@ async def upload_user_profile_picture(
     current_user: CurrentUser,
     db: Annotated[AsyncSession, Depends(get_db)],
 ):
+    """Upload current user profile picture"""
     user_repository = UserRepository(db)
     user_service = UserService(user_repository)
 
@@ -194,6 +195,7 @@ async def delete_user_profile_picture(
     current_user: CurrentUser,
     db: Annotated[AsyncSession, Depends(get_db)],
 ):
+    """Delete current user profile picture"""
     user_repository = UserRepository(db)
     user_service = UserService(user_repository)
 

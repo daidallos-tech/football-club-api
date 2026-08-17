@@ -8,7 +8,6 @@ class UserRepository:
         self.session = db_session
 
     async def create_user(self, username: str, email: str, password_hash: str) -> User:
-        """ Create new user """
 
         new_user = User(
             username=username,
@@ -22,28 +21,24 @@ class UserRepository:
         return new_user
 
     async def get_by_username_lower(self, username: str) -> User | None:
-        """ Search user by username """
         result = await self.session.execute(
             select(User).where(User.username == username)
         )
         return result.scalars().first()
 
     async def get_by_email_lower(self, email: str) -> User | None:
-        """ Search user by email """
         result = await self.session.execute(
             select(User).where(User.email == email)
         )
         return result.scalars().first()
 
     async def get_user_by_user_id(self, user_id: int) -> User | None:
-        """ Search user by user id """
         result = await self.session.execute(
             select(User).where(User.id == user_id)
         )
         return result.scalars().first()
 
     async def get_user_by_email_or_username(self, login: str) -> User | None:
-        """ Search user by email or username """
         result = await self.session.execute(
             select(User).where(
                 (User.email == login) | (User.username == login)
@@ -61,7 +56,6 @@ class UserRepository:
         return db_user
 
     async def delete_user(self, db_user: User) -> None:
-        """ Delete user """
         await self.session.delete(db_user)
         await self.session.commit()
 
