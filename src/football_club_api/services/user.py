@@ -135,3 +135,40 @@ class UserService:
         print("DB", updated_db_user.id, updated_db_user.username, updated_db_user.email)
         
         return UserPrivate.model_validate(updated_db_user)
+
+    async def admin_update_user_image_by_id(self, user_id: int, file: UploadFile) -> UserPrivate:
+        content = await file.read()
+        if len(content) > settings.max_upload_size_bytes:
+            max_mb = settings.max_upload_size_bytes // (1024 * 1024)
+            raise ValueError(f"File too large. Maximum size is {max_mb}MB")
+
+        try:
+            new_filename = await run_in_threadpool(process_and_save_image, content, "user")
+        except UnidentifiedImageError:
+            raise ValueError("Invalid image file. Please upload a valid image (JPEG, PNG, GIF, WebP).")
+
+        db_user = await self.user_repo.get_user_by_user_id(user_id)
+        if not db_user:
+            delete_image(new_filename, "user")
+            raise ValueError("User not found")
+
+        old_filename = db_user.image_file
+
+        update_data = {"image_file": new_filename}
+        updated_db_user = await self.user_repo.update_user(db_user, update_data)
+
+        if old_filename:
+            await run_in_threadpool(delete_image, old_filename, "user")
+
+        return UserPrivate.model_validate(updated_db_user)
+
+    async def admin_delete_user_image_by_id(self, user_id: int) -> None:
+        db_user = await self.user_repo.get_user_by_user_id(user_id)
+                
+        if not db_user or not db_user.image_file:
+            raise ValueError("User or picture not found")
+
+        old_filename = db_user.image_file
+
+        await self.user_repo.update_user(db_user, {"image_file": None})
+        await run_in_threadpool(delete_image, old_filename, "user")
