@@ -75,6 +75,7 @@ async def admin_update_user_picture_by_id(
 @router.delete("/{user_id}/picture", status_code=status.HTTP_204_NO_CONTENT)
 async def admin_delete_user_profile_picture_by_id(
      user_id: int,
+     current_admin: CurrentAdmin,
      db: Annotated[AsyncSession, Depends(get_db)],
 ):
     user_repository = UserRepository(db)
