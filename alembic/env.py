@@ -1,3 +1,6 @@
+import sys
+import os
+
 import asyncio
 from logging.config import fileConfig
 
@@ -7,6 +10,9 @@ from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from alembic import context
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "src")))
+
 from football_club_api.db import settings, Base
 from football_club_api import models
 

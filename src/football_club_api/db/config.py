@@ -18,6 +18,8 @@ class Settings(BaseSettings):
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
 
+    FOOTBALL_API_TOKEN: str
+
     reset_token_expire_minutes: int = 60
 
     max_upload_size_bytes: int = 5 * 1024 * 1024

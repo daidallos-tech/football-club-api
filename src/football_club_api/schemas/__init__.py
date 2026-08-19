@@ -1,5 +1,6 @@
 from .user import UserCreate, UserPrivate, UserPublic, UserUpdate
 from .password import ForgotPasswordRequest, ResetPasswordRequest, ChangePasswordRequest
+from .team import TeamCreateDTO
 
 __all__ = [
     "UserCreate",
@@ -8,5 +9,6 @@ __all__ = [
     "ChangePasswordRequest",
     "UserPrivate",
     "UserPublic",
-    "UserUpdate"
+    "UserUpdate",
+    "TeamCreateDTO"
 ]
