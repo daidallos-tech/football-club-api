@@ -36,3 +36,9 @@ class TeamRepository:
         stmt = select(Teams).where(Teams.country == country)
         result = await self.session.execute(stmt)
         return result.scalars().all()
+
+    async def get_team_by_team_id(self, team_id: int) -> Teams | None:
+        result = await self.session.execute(
+            select(Teams).where(Teams.id == team_id)
+        )
+        return result.scalars().first()
