@@ -18,7 +18,7 @@ async def test_update_user_profile_by_admin_success(client: AsyncClient, db_sess
     user_id = user_response.json()["id"]
 
     update_response = await client.patch(
-        f"/api/admin/{user_id}",
+        f"/api/admin/users/{user_id}",
         json={
             "username": "update_username"
         },
@@ -47,7 +47,7 @@ async def test_update_user_profile_by_non_admin(client: AsyncClient):
     user_id = user_response.json()["id"]
 
     update_response = await client.patch(
-        f"/api/admin/{user_id}",
+        f"/api/admin/users/{user_id}",
         json={
             "username": "update_username"
         },
@@ -72,7 +72,7 @@ async def test_delete_user_profile_by_admin_success(client: AsyncClient, db_sess
     user_id = user_response.json()["id"]
 
     delete_response = await client.delete(
-        f"/api/admin/{user_id}",
+        f"/api/admin/users/{user_id}",
         headers=headers
     )
 
@@ -92,7 +92,7 @@ async def test_delete_user_profile_by_non_admin(client: AsyncClient):
     user_id = user_response.json()["id"]
 
     delete_response = await client.delete(
-        f"/api/admin/{user_id}",
+        f"/api/admin/users/{user_id}",
         headers=headers
     )
 
@@ -116,7 +116,7 @@ async def test_update_user_profile_picture_by_admin_success(client: AsyncClient,
     image_bytes = test_image_path.read_bytes()
 
     update_response = await client.patch(
-        f"/api/admin/{user_id}/picture",
+        f"/api/admin/users/{user_id}/picture",
         files={"file": ("profile.jpg", image_bytes, "image/jpeg")},
         headers=headers
     )
@@ -143,7 +143,7 @@ async def test_update_user_profile_picture_by_non_admin(client: AsyncClient):
     image_bytes = test_image_path.read_bytes()
 
     update_response = await client.patch(
-        f"/api/admin/{user_id}/picture",
+        f"/api/admin/users/{user_id}/picture",
         files={"file": ("profile.jpg", image_bytes, "image/jpeg")},
         headers=headers
     )
@@ -168,14 +168,14 @@ async def test_delete_user_profile_picture_by_admin_success(client: AsyncClient,
     image_bytes = test_image_path.read_bytes()
 
     update_response = await client.patch(
-        f"/api/admin/{user_id}/picture",
+        f"/api/admin/users/{user_id}/picture",
         files={"file": ("profile.jpg", image_bytes, "image/jpeg")},
         headers=headers
     )
     assert update_response.status_code == 200
 
     delete_response = await client.delete(
-        f"/api/admin/{user_id}/picture",
+        f"/api/admin/users/{user_id}/picture",
         headers=headers
     )
 
@@ -195,7 +195,7 @@ async def test_delete_user_profile_picture_by_non_admin(client: AsyncClient):
     user_id = user_response.json()["id"]
 
     delete_response = await client.delete(
-        f"/api/admin/{user_id}/picture",
+        f"/api/admin/users/{user_id}/picture",
         headers=headers
     )
 

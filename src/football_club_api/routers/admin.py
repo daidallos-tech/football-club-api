@@ -6,7 +6,7 @@ from football_club_api.db import get_db
 from football_club_api.repositories import UserRepository
 from football_club_api.services import UserService
 from football_club_api.security import CurrentAdmin
-from football_club_api.schemas import UserUpdate, UserPrivate, UserPublic
+from football_club_api.schemas import UserUpdate, UserPrivate
 
 
 router = APIRouter()
