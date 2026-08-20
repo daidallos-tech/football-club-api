@@ -40,3 +40,22 @@ class TeamService:
             raise ValueError("Team not found")
             
         return TeamResponse.model_validate(team)
+
+    async def get_teams_catalog(
+            self,
+            limit: int,
+            offset: int,
+            leauge: str | None = None,
+            country: str | None = None
+        ) -> tuple[list[TeamResponse], int]:
+            
+            items, total = await self.team_repo.get_teams_by_parameters_paginate(
+                limit=limit,
+                offset=offset,
+                league=leauge,
+                country=country
+            )
+    
+            validated_items = [TeamResponse.model_validate(team) for team in items]
+    
+            return validated_items, total

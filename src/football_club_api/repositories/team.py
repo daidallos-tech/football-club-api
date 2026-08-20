@@ -2,7 +2,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.dialects.postgresql import insert
 from football_club_api.models import Teams, Player
 from football_club_api.schemas import TeamCreateDTO, PlayerCreateDTO
-from sqlalchemy import select
+from sqlalchemy import select, func
 from collections.abc import Sequence 
 
 from typing import List
@@ -60,3 +60,34 @@ class TeamRepository:
             select(Teams).where(Teams.id == team_id)
         )
         return result.scalars().first()
+
+    async def get_teams_by_parameters_paginate(
+            self,
+            limit: int,
+            offset: int,
+            league: str | None = None,
+            country: str | None = None
+        ) -> tuple[Sequence[Teams], int]:
+            query = select(Teams)
+            
+            count_query = select(func.count()).select_from(Teams)
+    
+            filters = []
+            if league:
+                filters.append(Teams.league_code == league)
+            if country:
+                filters.append(Teams.country == country)
+    
+            if filters:
+                query = query.where(*filters)
+                count_query = count_query.where(*filters)
+    
+            query = query.order_by(Teams.id.desc()).limit(limit).offset(offset)
+    
+            total_result = await self.session.execute(count_query)
+            total = total_result.scalar_one()
+    
+            items_result = await self.session.execute(query)
+            items = items_result.scalars().all()
+    
+            return items, total
