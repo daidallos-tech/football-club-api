@@ -6,7 +6,7 @@ class Teams(Base):
     __tablename__ = "teams"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=False)
-    name: Mapped[str] = mapped_column(String(100))
+    name: Mapped[str] = mapped_column(String(100), index=True)
     short_name: Mapped[str] = mapped_column(String(50))
     tla: Mapped[str] = mapped_column(String(10))
     founded: Mapped[int | None] = mapped_column(Integer, nullable=True)

@@ -23,7 +23,15 @@ class TeamService:
             dto = TeamCreateDTO(**team_json)
             teams_dto.append(dto)
 
+        print(f"Writing teams {league_code}...")
         await self.team_repo.upsert_teams(teams_dto)
+
+        print(f"Uploading team players in PostgreSQL...")
+        for team_dto in teams_dto:
+            if team_dto.squad:
+                await self.team_repo.upsert_players(players_dto=team_dto.squad, team_id=team_dto.id)
+                
+        print(f"Synchronization was successfully done!")
 
     async def get_team_by_id(self, team_id: int) -> TeamResponse:
         team = await self.team_repo.get_team_by_team_id(team_id)

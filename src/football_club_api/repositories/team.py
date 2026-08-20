@@ -1,7 +1,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.dialects.postgresql import insert
-from football_club_api.models import Teams
-from football_club_api.schemas import TeamCreateDTO
+from football_club_api.models import Teams, Player
+from football_club_api.schemas import TeamCreateDTO, PlayerCreateDTO
 from sqlalchemy import select
 from collections.abc import Sequence 
 
@@ -12,9 +12,10 @@ class TeamRepository:
         self.session = session
 
     async def upsert_teams(self, teams_dto: List[TeamCreateDTO]) -> None:
+        """Add football teams in your database"""
         for dto in teams_dto:
             # {"id": 57, "name": "Arsenal FC", "short_name": "Arsenal", "tla": "ARS"}
-            insert_data = dto.model_dump(by_alias=False)
+            insert_data = dto.model_dump(by_alias=False, exclude={"squad"})
             
             stmt = insert(Teams).values(**insert_data)
             
@@ -25,6 +26,23 @@ class TeamRepository:
             
             await self.session.execute(stmt)
         
+        await self.session.commit()
+
+    async def upsert_players(self, players_dto: List[PlayerCreateDTO], team_id: int) -> None:
+        """Add football players in your database"""
+        for dto in players_dto:
+            insert_data = dto.model_dump(by_alias=False)
+            
+            insert_data["team_id"] = team_id
+            
+            stmt = insert(Player).values(**insert_data)
+            
+            stmt = stmt.on_conflict_do_update(
+                index_elements=[Player.id],
+                set_={k: v for k, v in insert_data.items() if k != "id"}
+            )
+            await self.session.execute(stmt)
+            
         await self.session.commit()
 
     async def get_teams_by_league(self, league_code: str) -> Sequence[Teams]:
