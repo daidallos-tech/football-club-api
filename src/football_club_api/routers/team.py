@@ -21,6 +21,7 @@ async def get_team_service(db: Annotated[AsyncSession, Depends(get_db)]) -> Team
 async def get_players_catalog(
     service: Annotated[TeamService, Depends(get_team_service)],
     pagination: Annotated[LimitOffsetParams, Depends()], 
+    name: str | None = None,
     league: str | None = None,
     country: str | None = None                      
 ):
@@ -28,6 +29,7 @@ async def get_players_catalog(
         items, total = await service.get_teams_catalog(
             limit=pagination.limit,
             offset=pagination.offset,
+            name=name,
             leauge=league,
             country=country
         )

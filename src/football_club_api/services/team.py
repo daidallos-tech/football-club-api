@@ -45,6 +45,7 @@ class TeamService:
             self,
             limit: int,
             offset: int,
+            name: str | None = None,
             leauge: str | None = None,
             country: str | None = None
         ) -> tuple[list[TeamResponse], int]:
@@ -52,6 +53,7 @@ class TeamService:
             items, total = await self.team_repo.get_teams_by_parameters_paginate(
                 limit=limit,
                 offset=offset,
+                name=name,
                 league=leauge,
                 country=country
             )

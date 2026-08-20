@@ -65,6 +65,7 @@ class TeamRepository:
             self,
             limit: int,
             offset: int,
+            name: str | None = None,
             league: str | None = None,
             country: str | None = None
         ) -> tuple[Sequence[Teams], int]:
@@ -73,6 +74,8 @@ class TeamRepository:
             count_query = select(func.count()).select_from(Teams)
     
             filters = []
+            if name:
+                filters.append(Teams.name == name)
             if league:
                 filters.append(Teams.league_code == league)
             if country:
