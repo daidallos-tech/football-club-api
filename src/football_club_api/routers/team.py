@@ -61,4 +61,4 @@ async def get_team_by_id(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=str(e)
-        )
+        )   

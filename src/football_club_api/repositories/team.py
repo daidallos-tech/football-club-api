@@ -61,6 +61,12 @@ class TeamRepository:
         )
         return result.scalars().first()
 
+    async def get_team_by_name(self, team_name: str) -> Teams | None:
+        result = await self.session.execute(
+            select(Teams).where(Teams.name == team_name)
+        )
+        return result.scalars().first()
+
     async def get_teams_by_parameters_paginate(
             self,
             limit: int,
@@ -94,3 +100,21 @@ class TeamRepository:
             items = items_result.scalars().all()
     
             return items, total
+
+
+    async def create_team(self, id: int, name: str, short_name: str, tla: str, founded: int, country: str, league_code: str) -> Teams:
+
+        new_team = Teams(
+            id=id,
+            name=name,
+            short_name=short_name,
+            tla=tla,
+            founded=founded,
+            country=country,
+            league_code=league_code
+        )
+
+        self.session.add(new_team)
+        await self.session.commit()
+        await self.session.refresh(new_team)
+        return new_team

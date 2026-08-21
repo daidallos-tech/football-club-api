@@ -26,6 +26,14 @@ class TeamBase(BaseModel):
     tla: str
     founded: Optional[int] = None
 
+class TeamCreate(BaseModel):
+    name: str
+    short_name: str = Field(alias="shortName")
+    tla: str
+    founded: Optional[int] = None
+    country: str
+    league_code: str
+
 class TeamCreateDTO(TeamBase):
     country: str
     league_code: str
