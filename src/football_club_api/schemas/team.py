@@ -32,7 +32,7 @@ class TeamCreate(BaseModel):
     tla: str
     founded: Optional[int] = None
     country: str
-    league_code: str
+    league_code: str = Field(alias="leagueCode")
 
 class TeamCreateDTO(TeamBase):
     country: str
@@ -41,5 +41,5 @@ class TeamCreateDTO(TeamBase):
 
 class TeamResponse(TeamBase):
     country: str
-    league_code: str
+    league_code: str = Field(alias="leagueCode")
 
