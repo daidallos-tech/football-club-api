@@ -43,3 +43,10 @@ class TeamResponse(TeamBase):
     country: str
     league_code: str = Field(alias="leagueCode")
 
+class TeamUpdate(BaseModel):
+    name: str | None = None
+    short_name: str | None = None; Field(alias="shortName")
+    tla: str
+    founded: Optional[int] = None
+    country: str | None = None
+    league_code: str | None = None; Field(alias="leagueCode")

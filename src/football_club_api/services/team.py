@@ -1,7 +1,7 @@
 import random
 from football_club_api.clients import FootballDataClient
 from football_club_api.repositories import TeamRepository
-from football_club_api.schemas import TeamCreateDTO, TeamResponse, TeamCreate
+from football_club_api.schemas import TeamCreateDTO, TeamResponse, TeamCreate, TeamUpdate
 
 class TeamService:
     def __init__(self, team_repo: TeamRepository, api_client: FootballDataClient | None = None):
@@ -93,3 +93,30 @@ class TeamService:
         )
 
         return TeamResponse.model_validate(db_team)
+
+    async def admin_update_partial_team_by_id(self, team_id: int, team_update: TeamUpdate) -> TeamResponse:
+            db_team = await self.team_repo.get_team_by_team_id(team_id)
+                    
+            if not db_team:
+                raise ValueError(f"Team with ID {team_id} not found")
+    
+            update_data = team_update.model_dump(exclude_unset=True)
+            
+            if "name" in update_data:
+                new_name = update_data["name"].strip()
+                if new_name != db_team.name:
+                    if await self.team_repo.get_team_by_name(new_name):
+                        raise ValueError("Username already exists")
+                update_data["name"] = new_name
+    
+            updated_db_team = await self.team_repo.update_team(db_team, update_data)
+            
+            return TeamResponse.model_validate(updated_db_team)
+
+    async def admin_delete_team_by_id(self, team_id: int) -> None:
+            db_team = await self.team_repo.get_team_by_team_id(team_id)
+            
+            if not db_team:
+                raise ValueError(f"Team with ID {team_id} not found")
+        
+            await self.team_repo.delete_team(db_team)

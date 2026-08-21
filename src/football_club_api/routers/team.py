@@ -18,7 +18,7 @@ async def get_team_service(db: Annotated[AsyncSession, Depends(get_db)]) -> Team
     return TeamService(repo) 
 
 @router.get("/", response_model=LimitOffsetPage[TeamResponse])
-async def get_players_catalog(
+async def get_teams_catalog(
     service: Annotated[TeamService, Depends(get_team_service)],
     pagination: Annotated[LimitOffsetParams, Depends()], 
     name: str | None = None,

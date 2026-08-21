@@ -118,3 +118,16 @@ class TeamRepository:
         await self.session.commit()
         await self.session.refresh(new_team)
         return new_team
+
+    async def update_team(self, db_team: Teams, update_data: dict) -> Teams:
+            for key, value in update_data.items():
+                setattr(db_team, key, value) 
+    
+            self.session.add(db_team)
+            await self.session.commit()
+            await self.session.refresh(db_team)
+            return db_team
+
+    async def delete_team(self, db_team: Teams) -> None:
+        await self.session.delete(db_team)
+        await self.session.commit()
