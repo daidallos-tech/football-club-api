@@ -33,6 +33,7 @@ def test_engine():
 @pytest.fixture(scope="session", autouse=True)
 async def setup_database(test_engine):
     async with test_engine.begin() as conn:
+        await conn.execute(text("CREATE EXTENSION IF NOT EXISTS citext;"))
         await conn.run_sync(Base.metadata.create_all)
 
     yield
