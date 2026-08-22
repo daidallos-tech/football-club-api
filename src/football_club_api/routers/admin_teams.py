@@ -72,7 +72,7 @@ async def admin_delete_team_by_id(
         await team_service.admin_delete_team_by_id(team_id)
     except ValueError as e:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
+            status_code=status.HTTP_404_NOT_FOUND,
             detail=str(e)
         )
     

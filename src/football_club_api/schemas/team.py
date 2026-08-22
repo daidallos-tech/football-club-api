@@ -1,6 +1,8 @@
 from datetime import date
 from pydantic import BaseModel, Field, ConfigDict
 from typing import List, Optional
+from typing_extensions import Annotated
+from pydantic.types import StringConstraints
 
 class PlayerBase(BaseModel):
     model_config = ConfigDict(populate_by_name=True, from_attributes=True)
@@ -17,36 +19,39 @@ class PlayerCreateDTO(PlayerBase):
 class PlayerResponse(PlayerBase):
     team_id: int
 
+CleanString = Annotated[str, StringConstraints(min_length=1, strip_whitespace=True)]
+ValidYear = Annotated[int, Field(ge=1500, le=2100)]
+
 class TeamBase(BaseModel):
     model_config = ConfigDict(populate_by_name=True, from_attributes=True)
 
     id: int 
-    name: str
-    short_name: str = Field(alias="shortName")
-    tla: str
-    founded: Optional[int] = None
+    name: CleanString | None = None
+    short_name: CleanString | None = Field(alias="shortName")
+    tla: CleanString
+    founded: ValidYear | None = None
 
 class TeamCreate(BaseModel):
-    name: str
-    short_name: str = Field(alias="shortName")
-    tla: str
-    founded: Optional[int] = None
-    country: str
-    league_code: str = Field(alias="leagueCode")
+    name: CleanString 
+    short_name: CleanString = Field(alias="shortName")
+    tla: CleanString
+    founded: ValidYear | None = None
+    country: CleanString
+    league_code: CleanString = Field(alias="leagueCode")
 
 class TeamCreateDTO(TeamBase):
-    country: str
-    league_code: str
+    country: CleanString
+    league_code: CleanString
     squad: List[PlayerCreateDTO] = []
 
 class TeamResponse(TeamBase):
-    country: str
-    league_code: str = Field(alias="leagueCode")
+    country: CleanString | None = None
+    league_code: CleanString | None = Field(alias="leagueCode")
 
 class TeamUpdate(BaseModel):
-    name: str | None = None
-    short_name: str | None = None; Field(alias="shortName")
-    tla: str
-    founded: Optional[int] = None
-    country: str | None = None
-    league_code: str | None = None; Field(alias="leagueCode")
+    name: CleanString | None = None
+    short_name: CleanString | None = Field(default=None, alias="shortName")
+    tla: CleanString | None = None
+    founded: ValidYear | None = None
+    country: CleanString | None = None
+    league_code: CleanString | None = Field(default=None, alias="leagueCode")

@@ -99,14 +99,14 @@ class TeamService:
                     
             if not db_team:
                 raise ValueError(f"Team with ID {team_id} not found")
-    
+
             update_data = team_update.model_dump(exclude_unset=True)
             
             if "name" in update_data:
                 new_name = update_data["name"].strip()
                 if new_name != db_team.name:
                     if await self.team_repo.get_team_by_name(new_name):
-                        raise ValueError("Username already exists")
+                        raise ValueError("Name already exists")
                 update_data["name"] = new_name
     
             updated_db_team = await self.team_repo.update_team(db_team, update_data)
