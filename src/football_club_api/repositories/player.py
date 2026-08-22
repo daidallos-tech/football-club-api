@@ -1,3 +1,4 @@
+from datetime import date
 from sqlalchemy.ext.asyncio import AsyncSession
 from football_club_api import models
 from football_club_api.models import Player
@@ -45,3 +46,32 @@ class PlayerRepository:
         items = items_result.scalars().all()
 
         return items, total
+
+    async def create_player(self, id: int, name: str, position: str, date_of_birth: date | None, nationality: str, team_id: int) -> Player:
+    
+        new_player = Player(
+            id=id,
+            name=name,
+            position=position,
+            date_of_birth=date_of_birth,
+            nationality=nationality,
+            team_id=team_id
+        )
+
+        self.session.add(new_player)
+        await self.session.commit()
+        await self.session.refresh(new_player)
+        return new_player
+
+    async def update_player(self, db_player: Player, update_data: dict) -> Player:
+        for key, value in update_data.items():
+            setattr(db_player, key, value) 
+
+        self.session.add(db_player)
+        await self.session.commit()
+        await self.session.refresh(db_player)
+        return db_player
+    
+    async def delete_player(self, db_team: Player) -> None:
+        await self.session.delete(db_team)
+        await self.session.commit()

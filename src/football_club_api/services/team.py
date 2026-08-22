@@ -95,28 +95,28 @@ class TeamService:
         return TeamResponse.model_validate(db_team)
 
     async def admin_update_partial_team_by_id(self, team_id: int, team_update: TeamUpdate) -> TeamResponse:
-            db_team = await self.team_repo.get_team_by_team_id(team_id)
-                    
-            if not db_team:
-                raise ValueError(f"Team with ID {team_id} not found")
+        db_team = await self.team_repo.get_team_by_team_id(team_id)
+                
+        if not db_team:
+            raise ValueError(f"Team with ID {team_id} not found")
 
-            update_data = team_update.model_dump(exclude_unset=True)
-            
-            if "name" in update_data:
-                new_name = update_data["name"].strip()
-                if new_name != db_team.name:
-                    if await self.team_repo.get_team_by_name(new_name):
-                        raise ValueError("Name already exists")
-                update_data["name"] = new_name
-    
-            updated_db_team = await self.team_repo.update_team(db_team, update_data)
-            
-            return TeamResponse.model_validate(updated_db_team)
+        update_data = team_update.model_dump(exclude_unset=True)
+        
+        if "name" in update_data:
+            new_name = update_data["name"].strip()
+            if new_name != db_team.name:
+                if await self.team_repo.get_team_by_name(new_name):
+                    raise ValueError("Name already exists")
+            update_data["name"] = new_name
+
+        updated_db_team = await self.team_repo.update_team(db_team, update_data)
+        
+        return TeamResponse.model_validate(updated_db_team)
 
     async def admin_delete_team_by_id(self, team_id: int) -> None:
-            db_team = await self.team_repo.get_team_by_team_id(team_id)
-            
-            if not db_team:
-                raise ValueError(f"Team with ID {team_id} not found")
+        db_team = await self.team_repo.get_team_by_team_id(team_id)
         
-            await self.team_repo.delete_team(db_team)
+        if not db_team:
+            raise ValueError(f"Team with ID {team_id} not found")
+    
+        await self.team_repo.delete_team(db_team)
