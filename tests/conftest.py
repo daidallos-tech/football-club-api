@@ -141,25 +141,3 @@ async def login_admin(client: AsyncClient) -> str:
     
     return response.json()["access_token"]
 
-async def create_test_team(
-    client: AsyncClient,
-    name: str = "TestTeam",
-    short_name: str = "TT",
-    tla: str = "TMT",
-    founded: int = 2026,
-    country: str = "Testyland",
-    league_code: str = "PT"
-) -> dict:
-    response = await client.post(
-        "/api/teams",
-        json={
-            "name": name,
-            "short_name": short_name,
-            "tla": tla,
-            "founded": founded,
-            "country": country,
-            "league_code": league_code
-        },
-    )
-    assert response.status_code == 201, f"Failed to create team: {response.text}"
-    return response.json()
