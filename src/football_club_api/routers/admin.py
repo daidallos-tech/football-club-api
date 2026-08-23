@@ -17,7 +17,7 @@ async def admin_delete_user_by_id(
     db: Annotated[AsyncSession, Depends(get_db)],
     current_admin: CurrentAdmin,
 ):
-    """Admin delete user by their id"""
+    """Delete user by their id by Admin"""
     user_repository = UserRepository(db)
     user_service = UserService(user_repository)
 
@@ -36,7 +36,7 @@ async def admin_partial_update_user_profile_by_id(
     db: Annotated[AsyncSession, Depends(get_db)],
     current_admin: CurrentAdmin,
 ) -> UserPrivate:
-    """Admin update user's profile information by their id"""
+    """Update user's profile information by their id by Admin"""
     user_repository = UserRepository(db)
     user_service = UserService(user_repository)
 
@@ -59,7 +59,7 @@ async def admin_update_user_picture_by_id(
     current_admin: CurrentAdmin,
     db: Annotated[AsyncSession, Depends(get_db)],
 ) -> UserPrivate:
-    """Admin update user's profile picture by their id"""
+    """Update user's profile picture by their id by Admin"""
     user_repository = UserRepository(db)
     user_service = UserService(user_repository)
 
@@ -81,7 +81,7 @@ async def admin_delete_user_profile_picture_by_id(
      current_admin: CurrentAdmin,
      db: Annotated[AsyncSession, Depends(get_db)],
 ):
-    """Admin delete user's profile picture by their id"""
+    """Delete user's profile picture by their id by Admin"""
     user_repository = UserRepository(db)
     user_service = UserService(user_repository)
 

@@ -24,6 +24,7 @@ async def get_players_catalog(
     position: str | None = None,                         
     nationality: str | None = None                       
 ):
+    """Get players by their position/nationality with pagination"""
     try:
         items, total = await service.get_players_catalog(
             limit=pagination.limit,

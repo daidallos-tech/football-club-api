@@ -19,7 +19,7 @@ async def create_player(
     current_admin: CurrentAdmin,
     db: Annotated[AsyncSession, Depends(get_db)]
 ) -> PlayerResponse:
-    """ Player creation """
+    """Player creation by Admin"""
     player_repository = PlayerRepository(db)
     team_repository = TeamRepository(db)
     player_service = PlayerService(player_repository, team_repository)
@@ -40,7 +40,7 @@ async def admin_partial_update_player_by_id(
     db: Annotated[AsyncSession, Depends(get_db)],
     current_admin: CurrentAdmin,
 ) -> PlayerResponse:
-    """Admin update player profile information by their id"""
+    """Player profile udpate information by their id by Admin"""
     team_repository = TeamRepository(db)
     palyer_repository = PlayerRepository(db)
     player_service = PlayerService(palyer_repository, team_repository)
@@ -63,7 +63,7 @@ async def admin_delete_player_by_id(
     db: Annotated[AsyncSession, Depends(get_db)],
     current_admin: CurrentAdmin,
 ):
-    "Admin delete any player by their id"
+    """Delete player by their id by Admin"""
     player_repository = PlayerRepository(db)
     team_repository = TeamRepository(db)
     player_service = PlayerService(player_repository, team_repository)

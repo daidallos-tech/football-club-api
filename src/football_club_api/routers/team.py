@@ -25,6 +25,7 @@ async def get_teams_catalog(
     league: str | None = None,
     country: str | None = None                      
 ):
+    """Get teams by their name/league/country with pagination"""
     try:
         items, total = await service.get_teams_catalog(
             limit=pagination.limit,

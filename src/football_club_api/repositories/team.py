@@ -75,6 +75,7 @@ class TeamRepository:
             league: str | None = None,
             country: str | None = None
         ) -> tuple[Sequence[Teams], int]:
+            """Get teams by their name/country/league"""
             query = select(Teams)
             
             count_query = select(func.count()).select_from(Teams)

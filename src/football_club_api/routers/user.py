@@ -21,7 +21,7 @@ async def create_user(
     user_data: UserCreate, 
     db: Annotated[AsyncSession, Depends(get_db)]
 ) -> UserPrivate:
-    """ User creation """
+    """User creation"""
     user_repository = UserRepository(db)
     auth_service = AuthService(user_repository)
     

@@ -23,6 +23,7 @@ class PlayerRepository:
         position: str | None = None,
         nationality: str | None = None
     ) -> tuple[Sequence[Player], int]:
+        """Get players by their position/nationality"""
         query = select(Player)
         
         count_query = select(func.count()).select_from(Player)

@@ -19,7 +19,7 @@ async def create_team(
     current_admin: CurrentAdmin,
     db: Annotated[AsyncSession, Depends(get_db)]
 ) -> TeamResponse:
-    """ Team creation """
+    """Create team by Admin"""
     team_repository = TeamRepository(db)
     team_service = TeamService(team_repository)
     
@@ -39,7 +39,7 @@ async def admin_partial_update_team_by_id(
     db: Annotated[AsyncSession, Depends(get_db)],
     current_admin: CurrentAdmin,
 ) -> TeamResponse:
-    """Admin update user's profile information by their id"""
+    """Update user's profile information by their id by Admin"""
     team_repository = TeamRepository(db)
     team_service = TeamService(team_repository)
 
@@ -64,7 +64,7 @@ async def admin_delete_team_by_id(
     db: Annotated[AsyncSession, Depends(get_db)],
     current_admin: CurrentAdmin,
 ):
-    "Admin delete any team by its id"
+    "Delete any team by its id by Admin"
     team_repository = TeamRepository(db)
     team_service = TeamService(team_repository)
 
