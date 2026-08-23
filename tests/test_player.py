@@ -104,7 +104,7 @@ async def test_get_players_with_paginate_success(client: AsyncClient, db_session
 
 
 @pytest.mark.anyio
-async def test_get_players_with_paginate_success(client: AsyncClient, db_session: AsyncSession):
+async def test_get_players_with_parameters_success_and_negative(client: AsyncClient, db_session: AsyncSession):
     await create_test_admin(client, db_session)
     token = await login_admin(client)
     headers = auth_header(token)
@@ -147,3 +147,14 @@ async def test_get_players_with_paginate_success(client: AsyncClient, db_session
     assert len(data["items"]) == 2
     assert data["limit"] == 50
     assert data["offset"] == 0
+
+    negative_position_response = await client.get("/api/players/?position=offense&limit=50&offset=0")
+
+    assert negative_position_response.status_code == 400
+
+    negative_nationality_response = await client.get("/api/players/?nationality=tratatata&limit=50&offset=0")
+
+    assert negative_nationality_response.status_code == 200
+    data = negative_nationality_response.json()
+    assert data["total"] == 0
+    assert len(data["items"]) == 0
