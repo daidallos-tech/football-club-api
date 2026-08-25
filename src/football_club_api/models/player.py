@@ -15,7 +15,7 @@ class Player(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=False)
     name: Mapped[str] = mapped_column(CITEXT(100))
-    position: Mapped[str] = mapped_column(CITEXT(50), index=True)
+    position: Mapped[str] = mapped_column(CITEXT(50), index=True, nullable=True)
     date_of_birth: Mapped[date] = mapped_column(Date, nullable=True)
     nationality: Mapped[str] = mapped_column(CITEXT(100), index=True)
 

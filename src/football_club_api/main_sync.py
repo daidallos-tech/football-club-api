@@ -15,7 +15,11 @@ async def main():
 
         print("Synchronization...")
         await sync_service.sync_teams(league_code="PL", country="England")
-        #await sync_service.sync_teams(league_code="PD", country="Spain")
+        await sync_service.sync_teams(league_code="BL1", country="Germany")
+        await sync_service.sync_teams(league_code="PD", country="Spain")
+        await sync_service.sync_teams(league_code="FL1", country="France")
+        await sync_service.sync_teams(league_code="SA", country="Italy")
+        await sync_service.sync_teams(league_code="PPL", country="Portugal")
         print("Date was added successfully in PostgreSQL!")
 
 if __name__ == "__main__":
