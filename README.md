@@ -21,13 +21,13 @@ This project was created as a learning and portfolio project to practice backend
 
 ### Teams
 
-- CRUD (for movie by admin)
+- CRUD (for teams by admin)
 - Pagination
 - External API to fulfill your DB or update data
 
 ### Players
 
-- CRUD (for director by admin)
+- CRUD (for players by admin)
 - Pagination\
 - External API to fulfill your DB or update data
 
