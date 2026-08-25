@@ -57,9 +57,6 @@ This project was created as a learning and portfolio project to practice backend
 ---
 
 ## 🏛️ Project Structure
-
-
-## Структура проекта
 <img width="574" height="1862" alt="image" src="https://github.com/user-attachments/assets/2dbecbd3-45e3-4745-9a9d-92a4661f709d" />
 
 ## 🔐 Authentication
